@@ -1,19 +1,24 @@
-import React from 'react'
-// import PropTypes from 'prop-types'
+import './UserList.scss'
 import * as api from '../../utils/api'
 import moment from 'moment'
-import {Table, Pagination} from 'antd'
+import React from 'react'
+import {Table, Pagination, Popconfirm, Button} from 'antd'
+import UserEditModal from './UserEditModal'
+import UserCreateModal from './UserCreateModal'
 
-import './UserList.scss'
 
 export default class UserList extends React.Component {
     constructor(props) {
         super(props)
 
         this.fetchUsers = this.fetchUsers.bind(this)
-        this.onChange = this.onChange.bind(this)
+        this.pageChangeHandler = this.pageChangeHandler.bind(this)
+        this.createHandler = this.createHandler.bind(this)
+        this.editHandler = this.editHandler.bind(this)
+        this.deleteHandler = this.deleteHandler.bind(this)
 
         this.state = {
+            loading: true,
             users: [],
             last: false,   //last page
             totalPages: 0,
@@ -34,6 +39,7 @@ export default class UserList extends React.Component {
         api.getUsers(pageIndex, pageSize).then(res => {
             console.log(res)
             this.setState({
+                loading: false,
                 users: res.content,
                 last: res.last,
                 totalPages: res.totalPages,
@@ -47,9 +53,21 @@ export default class UserList extends React.Component {
         })
     }
 
-    onChange(pageIndex) {
+    pageChangeHandler(pageIndex) {
         // 发给后台的页码从0开始
         this.fetchUsers(pageIndex - 1, this.state.pageSize)
+    }
+
+    editHandler(id, values) {
+        console.log(id, values)
+    }
+
+    deleteHandler(id) {
+        console.log(id)
+    }
+
+    createHandler(values) {
+        console.log(values)
     }
 
     render() {
@@ -74,7 +92,7 @@ export default class UserList extends React.Component {
             title: '注册时间',
             dataIndex: 'createdOn',
             key: 'createdOn',
-            render: text => moment(new Date(text)).format('YYYY-MM-DD | HH:mm:ss'),
+            render: text => moment(new Date(text)).format('YYYY-MM-DD HH:mm:ss'),
             // width: 200
         }, {
             title: '禁用',
@@ -93,26 +111,20 @@ export default class UserList extends React.Component {
             key: 'permissions',
             // width: 200
         }, {
-            title: '编辑',
-            key: 'action',
+            title: '操作',
+            key: 'operation',
             render: (text, record) => (
-                <span>
-                    <a href="#">编辑</a>
-                    <span className="ant-divider"></span>
-                    <a href="#">删除</a>
+                <span className="operation">
+                    <UserEditModal record={record} onOk={this.editHandler.bind(null, record.id)}>
+                        <a>编辑</a>
+                    </UserEditModal>
+                    <Popconfirm title="Confirm to delete?" onConfirm={this.deleteHandler.bind(null, record.id)}>
+                        <a href="">删除</a>
+                    </Popconfirm>
                 </span>
             ),
             // width: 200
         }]
-
-        let data = []
-
-        if (this.state.users.length > 0) {
-            data = [...this.state.users.map(u => {
-                u.key = u.id
-                return u
-            })]
-        }
 
         // rowSelection object indicates the need for row selection
         const rowSelection = {
@@ -123,14 +135,19 @@ export default class UserList extends React.Component {
 
         return (
             <div>
-                <Table rowSelection={rowSelection} columns={columns} dataSource={data} size="middle" bordered
+                <div className="create">
+                    <UserCreateModal record={{}} onOk={this.createHandler}>
+                        <Button type="primary">创建用户</Button>
+                    </UserCreateModal>
+                </div>
+                <Table rowSelection={rowSelection} loading={this.state.loading} columns={columns}
+                       dataSource={[...this.state.users]}
+                       rowKey={record => record.id} size="middle" bordered
                        pagination={false}/>
-                <Pagination className="center" current={this.state.pageIndex} onChange={this.onChange}
+                <Pagination className="center" current={this.state.pageIndex} onChange={this.pageChangeHandler}
                             total={this.state.totalElements}
                             pageSize={this.state.pageSize}/>
             </div>
         )
     }
 }
-
-// UserList.propTypes = { users: PropTypes.array.isRequired };
