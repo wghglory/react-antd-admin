@@ -8,17 +8,16 @@ $break-sm: 700px;
 $break-md: 1100px;
 $break-lg: 1600px;
 $break-xl: 2000px;
-
 @mixin shadow {
-  box-shadow: 3px 3px 8px 1px darken($light-grey, 20%);
+    box-shadow: 3px 3px 8px 1px darken($light-grey, 20%);
 }
 
 @mixin fade-bg($from, $to) {
-  background: $from;
-  background: linear-gradient(to bottom, $from 0%, $to 100%);
+    background: $from;
+    background: linear-gradient(to bottom, $from 0%, $to 100%);
 }
 
 @mixin clear {
-  margin: 0;
-  padding: 0;
+    margin: 0;
+    padding: 0;
 }

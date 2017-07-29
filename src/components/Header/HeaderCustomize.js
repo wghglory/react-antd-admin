@@ -1,11 +1,11 @@
 import React from 'react'
-import './Header.scss'
 import {Layout, Menu} from 'antd'
+import './Header.scss'
 
 export default () => (
     //<a href="#" onClick={location.href = "http://192.168.1.112:8282/center/logout/cas"}>Sign out</a>
     <Layout.Header className="header">
-        <div className="logo"/>
+        <div className="logo">创狐科技</div>
         <Menu
             theme="dark"
             mode="horizontal"

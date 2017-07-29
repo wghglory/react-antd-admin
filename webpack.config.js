@@ -1,9 +1,10 @@
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin') // create index.html injecting index_bundle.js in dist folder
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const webpack = require('webpack')
 
 const config = {
-    entry: './src/index.js',
+    entry: ['babel-polyfill', './src/index.js'],
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: 'bundle.js',
@@ -20,11 +21,18 @@ const config = {
                 exclude: /node_modules/
             },
             {
+                test: /\.(png|jpg|gif|svg|eot|ttf|woff|woff2)$/,
+                loader: 'url-loader',
+                options: {
+                    limit: 10000
+                }
+            },
+            {
                 test: /\.css$/,
                 use: ExtractTextPlugin.extract({
                     fallback: 'style-loader',
                     use: [
-                        {loader: 'css-loader', options: {modules: false, importLoaders: 1}},
+                        { loader: 'css-loader', options: { url: false, modules: false, importLoaders: 1 } },
                         {
                             loader: 'postcss-loader',
                             // Note: if postcss.config.js is in root, don't use config path. Use only file is another folder
@@ -42,15 +50,15 @@ const config = {
                             //   ]
                             // }
 
-                            options:
-                                {
-                                    config: {
-                                        ctx: {
-                                            cssnano: {},
-                                            autoprefixer: {}
-                                        }
+                            options: 
+                            {
+                                config: {
+                                    ctx: {
+                                        cssnano: {},
+                                        autoprefixer: {}
                                     }
                                 }
+                            }
                         }
                     ]
                 }),
@@ -62,7 +70,7 @@ const config = {
                 use: ExtractTextPlugin.extract({
                     fallback: 'style-loader',
                     use: [
-                        {loader: 'css-loader', options: {modules: false, importLoaders: 1}},
+                        { loader: 'css-loader', options: { modules: false, importLoaders: 1 } },
                         {
                             loader: 'postcss-loader',
                             // Note: if postcss.config.js is in root, don't use config path. Use only file is another folder
@@ -80,15 +88,15 @@ const config = {
                             //   ]
                             // }
 
-                            options:
-                                {
-                                    config: {
-                                        ctx: {
-                                            cssnano: {},
-                                            autoprefixer: {}
-                                        }
+                            options: 
+                            {
+                                config: {
+                                    ctx: {
+                                        cssnano: {},
+                                        autoprefixer: {}
                                     }
                                 }
+                            }
                         },
                         'sass-loader'
                     ]
@@ -110,6 +118,9 @@ const config = {
         new HtmlWebpackPlugin({
             template: 'src/index.html'
         }),
+        new webpack.DefinePlugin({
+            'process.env.NODE_ENV': process.env.NODE_ENV
+        }),
         new ExtractTextPlugin('style.css')
     ]
 }
@@ -129,4 +140,3 @@ if (process.env.NODE_ENV === 'production') {
 */
 
 module.exports = config
-
